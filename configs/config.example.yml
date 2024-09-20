@@ -1,0 +1,3 @@
+server:
+  web_port: 4000 # Port for web UI
+  mmdvm_port: 3000 # Port for MMDVM_Reflector reporter
