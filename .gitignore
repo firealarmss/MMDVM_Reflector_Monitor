@@ -18,6 +18,8 @@ pids
 # Coverage directories
 coverage/
 
+backend/test.js
+
 # Build directories
 build/
 dist/
