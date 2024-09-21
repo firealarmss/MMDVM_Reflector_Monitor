@@ -18,36 +18,65 @@ const digitalModeEnum = {
   0x00: 'NXDN',
   0x01: 'P25',
   0x02: 'YSF',
+  0X03: 'M17',
   0xFF: 'UNKNOWN',
 };
 
 function App() {
   const [reports, setReports] = useState([]);
-  const [connections, setConnections] = useState([]);
+  const [p25Connections, setP25Connections] = useState([]);
+  const [nxdnConnections, setNXDNConnections] = useState([]);
+  const [ysfConnections, setYSFConnections] = useState([]);
+  const [m17Connections, setM17Connections] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
   const [logsEnabled, setLogsEnabled] = useState(true);
 
   useEffect(() => {
     socket.on('initialData', (data) => {
       const normalReports = [];
-      let latestConnections = [];
+      let latestP25Connections = [];
+      let latestNXDNConnections = [];
+      let latestYSFConnections = [];
+      let latestM17Connections = []
 
       data.reverse().forEach((report) => {
         if (report.Type === 6) {
-          latestConnections = parseConnections(report.Extra);
+          if (report.Mode === 0x01) {
+            latestP25Connections = parseP25Connections(report.Extra);
+          } else if (report.Mode === 0x00) {
+            latestNXDNConnections = parseNXDNConnections(report.Extra);
+          } else if (report.Mode === 0x02) {
+            latestYSFConnections = parseYSFConnections(report.Extra);
+          } else if (report.Mode === 0x03) {
+            latestM17Connections = parseM17Connections(report.Extra);
+          }
         } else {
           normalReports.push(report);
         }
       });
 
       setReports(normalReports.slice(0, 5));
-      setConnections(latestConnections);
+      setP25Connections(latestP25Connections);
+      setNXDNConnections(latestNXDNConnections);
+      setYSFConnections(latestYSFConnections);
+      setM17Connections(latestM17Connections);
     });
 
     socket.on('newReport', (report) => {
       if (report.Type === 6) {
-        const newConnections = parseConnections(report.Extra);
-        setConnections((prevConnections) => updateConnections(prevConnections, newConnections));
+        if (report.Mode === 0x01) {
+          const newP25Connections = parseP25Connections(report.Extra);
+          setP25Connections((prevConnections) => updateConnections(prevConnections, newP25Connections));
+        } else if (report.Mode === 0x00) {
+          const newNXDNConnections = parseNXDNConnections(report.Extra);
+          setNXDNConnections((prevConnections) => updateConnections(prevConnections, newNXDNConnections));
+        } else if (report.Mode === 0x02) {
+          const newYSFConnections = parseYSFConnections(report.Extra);
+          setYSFConnections((prevConnections) => updateConnections(prevConnections, newYSFConnections));
+        } else if (report.Mode === 0x03) {
+          const newM17Connections = parseM17Connections(report.Extra);
+          setM17Connections((prevConnections) => updateConnections(prevConnections, newM17Connections));
+        }
       } else if (logsEnabled) {
         setReports((prevReports) => {
           const updatedReports = [report, ...prevReports];
@@ -65,7 +94,7 @@ function App() {
   const getTypeName = (value) => typeEnum[value] || 'UNKNOWN';
   const getModeName = (value) => digitalModeEnum[value] || 'UNKNOWN';
 
-  const parseConnections = (extra) => {
+  const parseP25Connections = (extra) => {
     try {
       const connectionsList = JSON.parse(extra);
       return connectionsList.map((conn) => ({
@@ -75,7 +104,50 @@ function App() {
         DstId: conn.TransmissionState.DstId,
       }));
     } catch (e) {
-      console.error('Failed to parse connections:', e);
+      console.error('Failed to parse P25 connections:', e);
+      return [];
+    }
+  };
+
+  const parseM17Connections = (extra) => {
+    try {
+      const connectionsList = JSON.parse(extra);
+      return connectionsList.map((conn) => ({
+        CallSign: conn.CallSign,
+        Address: conn.Address,
+        Module: conn.Module,
+        Transmitting: conn.Transmitting,
+      }));
+    } catch (e) {
+      console.error('Failed to parse M17 connections:', e);
+      return [];
+    }
+  };
+
+  const parseNXDNConnections = (extra) => {
+    try {
+      const connectionsList = JSON.parse(extra);
+      return connectionsList.map((conn) => ({
+        CallSign: conn.CallSign,
+        Address: conn.Address,
+        Transmitting: conn.Transmitting,
+      }));
+    } catch (e) {
+      console.error('Failed to parse NXDN connections:', e);
+      return [];
+    }
+  };
+
+  const parseYSFConnections = (extra) => {
+    try {
+      const connectionsList = JSON.parse(extra);
+      return connectionsList.map((conn) => ({
+        CallSign: conn.CallSign,
+        Address: conn.Address,
+        Transmitting: conn.Transmitting,
+      }));
+    } catch (e) {
+      console.error('Failed to parse YSF connections:', e);
       return [];
     }
   };
@@ -157,8 +229,9 @@ function App() {
             </div>
           </div>
 
+          {/* P25 Connections Table */}
           <div className="connection-box">
-            <h2>Connections</h2>
+            <h2>P25 Connections</h2>
             <div className="table-container">
               <table>
                 <thead>
@@ -170,13 +243,108 @@ function App() {
                 </tr>
                 </thead>
                 <tbody>
-                {connections.length > 0 ? (
-                    connections.map((conn, index) => (
+                {p25Connections.length > 0 ? (
+                    p25Connections.map((conn, index) => (
                         <tr key={index}>
                           <td>{conn.CallSign}</td>
                           <td>{conn.Address}</td>
                           <td>{conn.SrcId}</td>
                           <td>{conn.DstId}</td>
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                      <td colSpan="4">No active connections</td>
+                    </tr>
+                )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* NXDN Connections Table */}
+          <div className="connection-box">
+            <h2>NXDN Connections</h2>
+            <div className="table-container">
+              <table>
+                <thead>
+                <tr>
+                  <th>CallSign</th>
+                  <th>Address</th>
+                  <th>Transmitting</th>
+                </tr>
+                </thead>
+                <tbody>
+                {nxdnConnections.length > 0 ? (
+                    nxdnConnections.map((conn, index) => (
+                        <tr key={index}>
+                          <td>{conn.CallSign}</td>
+                          <td>{conn.Address}</td>
+                          <td>{conn.Transmitting ? 'Yes' : 'No'}</td>
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                      <td colSpan="3">No active connections</td>
+                    </tr>
+                )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* YSF Connections Table */}
+          <div className="connection-box">
+            <h2>YSF Connections</h2>
+            <div className="table-container">
+              <table>
+                <thead>
+                <tr>
+                  <th>CallSign</th>
+                  <th>Address</th>
+                  <th>Transmitting</th>
+                </tr>
+                </thead>
+                <tbody>
+                {ysfConnections.length > 0 ? (
+                    ysfConnections.map((conn, index) => (
+                        <tr key={index}>
+                          <td>{conn.CallSign}</td>
+                          <td>{conn.Address}</td>
+                          <td>{conn.Transmitting}</td>
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                      <td colSpan="3">No active connections</td>
+                    </tr>
+                )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* M17 Connections Table */}
+          <div className="connection-box">
+            <h2>M17 Connections</h2>
+            <div className="table-container">
+              <table>
+                <thead>
+                <tr>
+                  <th>CallSign</th>
+                  <th>Address</th>
+                  <th>Module</th>
+                  <th>Transmitting</th>
+                </tr>
+                </thead>
+                <tbody>
+                {m17Connections.length > 0 ? (
+                    m17Connections.map((conn, index) => (
+                        <tr key={index}>
+                          <td>{conn.CallSign}</td>
+                          <td>{conn.Address}</td>
+                          <td>{conn.Module}</td>
+                          <td>{conn.Transmitting ? "True" : "False"}</td>
                         </tr>
                     ))
                 ) : (
