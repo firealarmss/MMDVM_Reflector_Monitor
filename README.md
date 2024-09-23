@@ -1,4 +1,4 @@
-# MMDVM Reflector Monitor: This is the dashboard for [MMDVM Reflector](https://github.com/firealarmss/MMDVM_Reflector) built by Caleb KO4UYJ.
+# MMDVM Reflector Monitor: This is the dashboard for [MMDVM Reflector](https://github.com/firealarmss/MMDVM_Reflector).
 
 [![License](https://img.shields.io/badge/License-GPLv3-blue?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0)
 
