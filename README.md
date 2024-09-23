@@ -4,7 +4,7 @@
 
 ## Debian Basic Scripted Install:
 
-Here is the instructions on how to install this app onto debian machines:
+Debian install instructions:
 
 - `sudo apt update && sudo apt upgrade`
 - `sudo apt install git`
