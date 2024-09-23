@@ -6,8 +6,7 @@
 
 Debian install instructions:
 
-- `sudo apt update && sudo apt upgrade`
-- `sudo apt install git`
+- `sudo apt update && sudo apt upgrade && sudo apt install git`
 - `cd /opt`
 - `sudo git clone https://github.com/firealarmss/MMDVM_Reflector_Monitor`
 - `cd MMDVM_Reflector_Monitor/debian`
