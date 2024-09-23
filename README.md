@@ -4,7 +4,7 @@
 
 ## Debian Basic Scripted Install:
 
-The script downloads dotnet for compiling, compiles the app, and creates a service file so it can run in the background.
+Here is the instructions on how to install this app onto debian machines:
 
 - `sudo apt update && sudo apt upgrade`
 - `sudo apt install git`
