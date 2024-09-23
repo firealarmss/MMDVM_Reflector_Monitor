@@ -1,0 +1,13 @@
+[Unit]
+Description=MMDVM Reflector Monitor
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/
+ExecStart=/usr/bin/node /opt/MMDVM_Reflector_Monitor/backend/server.js -c /opt/MMDVM_Reflector_Monitor/configs/config.yml
+Restart=on-failure
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
