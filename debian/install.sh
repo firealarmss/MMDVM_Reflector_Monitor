@@ -39,7 +39,11 @@ npm i
 
 # Move configuration files
 mv configs/config.example.yml configs/config.yml
-mv mmdvm_reflector_monitor.service /etc/systemd/system/mmdvm_reflector_monitor.service
+mv debian/mmdvm_reflector_monitor.service /etc/systemd/system/mmdvm_reflector_monitor.service
+
+# Enable mmdvm_reflector_monitor service
+
+systemctl enable mmdvm_reflector_monitor
 
 # Add 10 line breaks
 for i in {1..10}
